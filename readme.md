@@ -1,7 +1,7 @@
 <br/>
 <br/>
 <div align="middle">
-    <img src="https://i.imgur.com/X0ou5EY.png" height=120>
+    <img src="https://i.imgur.com/aowfT0x.png" height=120>
 </div>
 
 #
@@ -23,6 +23,8 @@
 * <a href="#start">Quickstart</a>
 * <a href="#usecase">Use case</a>
 * <a href="#license">License</a>
+* <a href="https://marketplace.visualstudio.com/items?itemName=pushqrdx.inline-html">Inline HTML Extension for VS Code</a>
+* <a href="https://deno.land/x/htsx/mod.ts">API Reference</a>
 
 <h2 id="install"><strong>💾 Installation</strong></h2>
 
@@ -47,9 +49,12 @@ import { Router } from 'https://deno.land/x/oak/router.ts'
 ```
 Root
 │   main.ts      (main file)
-│
+│   
 └───web
     │   +root.ts      (<App/> like component)
+    │   +root.css     (global css)
+    │   +error.ts     (error component)
+    │   +root.ts      (error css)
     │
     ├───components
     │       Button.ts      (pure HTML component)
@@ -61,8 +66,11 @@ Root
         │
         └───api
             └───v1/user
-                    +get.ts      (GET handler)
-                    +post.ts     (POST handler)
+                    +users.ts       (simple users array for demonstartion)
+                    +get.ts         (GET handler)
+                    +post.ts        (POST handler)
+                    │
+                    │ ...+<method>.ts  (supported http method handler)
 ```
 For starters, let's create basic Oak server and pass app and router in `HTSX` class
 
@@ -77,10 +85,10 @@ const router = new Router()
 
 await new HTSX({ 
     root: './web', 
-    server: { app, router, () => { app.listen({ port: 8080 })} },
+    server: { app, router, init: () => { app.listen({ port: 8080 }); console.log('Server listening on 8080') } },
     props: {
-        payload: async (_ctx: Context) => {
-            return { name: 'John' };
+        payload: async (ctx: Context) => {
+            return { user: "John" }
         }
     }
 })
@@ -105,6 +113,13 @@ export default (props: HTSXProps) => { return /*html*/`
     </body>
     </html>
 `}
+```
+If you need to style root component, create:
+`web/+root.css`
+```css
+body {
+    background: lightblue;
+}
 ```
 
 Basic config is over, now you can create endpoints for your server in `routes` folder, for example - view endpoint on `/` and `Button` component
@@ -172,9 +187,31 @@ h1 {
 
 <img src="https://i.imgur.com/OFYmSle.png">
 
+#### Also you can specify error page when status !== 200
+
+`web/+error.ts`
+```ts
+import { HTSXProps } from "../mod.ts";
+
+export default (props: HTSXProps) => { return /*html*/`
+    <h1>ERROR: ${props.ctx?.response.status}</h1>
+`}
+```
+
+`web/+error.css`
+```css
+body {
+    background: red;
+    color: white;
+}
+```
+<img src="https://i.imgur.com/bn8rhbq.png">
+
+
+
 #### Now let's create REST API endpoint
 
-Create `+get.ts` or `+post.ts` in any directory inside routest directory, for example
+Create any supported `+<method>.ts` in any directory inside routes directory, for example:
 
 `/web/routes/api/v1/user/users.ts`
 ```ts
@@ -212,10 +249,20 @@ export default (ctx: Context, props: HTSXProps) => {
     return { id: 1, name: 'John Doe', age: 28, }
 }
 ```
-<img src="https://i.imgur.com/FJ8Vmic.png">
-<img src="https://i.imgur.com/CqGG3ro.png">
-<img src="https://i.imgur.com/tv4R3dj.png">
-<img src="https://i.imgur.com/MzxrCI6.png">
+<img src="https://i.imgur.com/FJ8Vmic.png" width="350">
+<img src="https://i.imgur.com/CqGG3ro.png" width="350">
+<img src="https://i.imgur.com/tv4R3dj.png" width="350">
+<img src="https://i.imgur.com/MzxrCI6.png" width="350">
+
+Supported methods:
+- `get`
+- `head`
+- `patch`
+- `options`
+- `delete`
+- `post`
+- `put`
+
 
 #### So here is example how to quickly create basic API and HTML site with cool DX
 
