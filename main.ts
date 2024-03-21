@@ -116,13 +116,14 @@ export default class HTSX {
                 })
             }
             const existing_endpoint = this.endpoints.findIndex(value => value.path === endpoint_path)
-            if (entry.name === HTSXViewFileNames.page_server) this.endpoints[existing_endpoint].handlers.view = (await import(absolute_path)).default
-            if (entry.name === HTSXViewFileNames.page_server) this.endpoints[existing_endpoint].handlers.head = (await import(absolute_path)).HEAD
+            if (entry.name === HTSXViewFileNames.page_server) this.endpoints[existing_endpoint].handlers.view = (await import(`file://${absolute_path}`)).default
+            if (entry.name === HTSXViewFileNames.page_server) this.endpoints[existing_endpoint].handlers.head = (await import(`file://${absolute_path}`)).HEAD
             if (entry.name === HTSXViewFileNames.page_client_js) this.endpoints[existing_endpoint].handlers.js = await Deno.readTextFile(absolute_path)
             if (entry.name === HTSXViewFileNames.page_client_css) this.endpoints[existing_endpoint].handlers.css = await Deno.readTextFile(absolute_path)
 
-            if (entry.name === HTSXApiFileNames.endpoint_get) this.endpoints[existing_endpoint].handlers.get = (await import(absolute_path)).default
-            if (entry.name === HTSXApiFileNames.endpoint_post) this.endpoints[existing_endpoint].handlers.post = (await import(absolute_path)).default
+            if (entry.name === HTSXApiFileNames.endpoint_get) this.endpoints[existing_endpoint].handlers.get = (await import(`file://${absolute_path}`)).default
+            if (entry.name === HTSXApiFileNames.endpoint_post) this.endpoints[existing_endpoint].handlers.post = (await import(`file://${absolute_path}`)).default
+            console.log(this.endpoints)
         }
         this.serve()
     }
