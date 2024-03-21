@@ -188,7 +188,7 @@ export default class HTSX {
 
         const root_path = path.join(this.options.root, HTSXRootFileNames.root)
         const root_path_css = path.join(this.options.root, HTSXRootFileNames.root_css)
-        const root_import = await import(root_path)
+        const root_import = await import(`file://${root_path}`)
         const root_css = await exists(root_path_css) === true ? await Deno.readTextFile(root_path_css) : null
 
         const root_html = await root_import.default(props)
